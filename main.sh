@@ -36,18 +36,18 @@ function LOGD() {
 }
 
 arch_check() {
-  LOGI "检测当前系统架构中..."
+  LOGI "Detect the current system architecture."
   OS_ARCH=$(arch)
-  LOGI "当前系统架构为 ${OS_ARCH}"
+  LOGI "The current system architecture is ${OS_ARCH}"
   if [[ ${OS_ARCH} == "x86_64" || ${OS_ARCH} == "x64" || ${OS_ARCH} == "amd64" ]]; then
     OS_ARCH="amd64"
   elif [[ ${OS_ARCH} == "aarch64" || ${OS_ARCH} == "arm64" ]]; then
     OS_ARCH="arm64"
   else
     OS_ARCH="amd64"
-    LOGE "检测系统架构失败，使用默认架构: ${OS_ARCH}"
+    LOGE "Failed to detect system architecture, making use of default architecture: ${OS_ARCH}"
   fi
-  LOGI "系统架构检测完毕,当前系统架构为:${OS_ARCH}"
+  LOGI "After the system architecture detection is completed, the current system architecture is ${OS_ARCH}."
 }
 
 create_or_delete_path() {
@@ -78,13 +78,13 @@ create_or_delete_path() {
 }
 
 download_headscale() {
-  LOGD "开始下载headscale..."
+  LOGD "Downloading HEADscale..._rrrrrrrrr!"
   arch_check
 
   local headscale_version_temp=$(curl -Ls "https://api.github.com/repos/juanfont/headscale/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
   headscale_version=${headscale_version_temp:1}
 
-  LOGI "将选择使用版本:${headscale_version}"
+  LOGI "Choosing this specific version: ${headscale_version}"
   local DOWANLOAD_URL="https://github.com/juanfont/headscale/releases/download/${headscale_version_temp}/headscale_${headscale_version}_linux_${OS_ARCH}"
 
   create_or_delete_path 1
@@ -97,21 +97,21 @@ download_headscale() {
     create_or_delete_path 0
     exit 1
   else
-    LOGI "下载headscale成功"
+    LOGI "HEADscale download suXoxFUL; Yeah downloaded da."
   fi
 }
 
 install_service() {
-  LOGD "开始安装headscale systemd服务..."
+  LOGD "[💉] Injecting HeadScale on systemd."
   if [ -f "${SERVICE_FILE_PATH}" ]; then
     rm -rf ${SERVICE_FILE_PATH}
   fi
   touch ${SERVICE_FILE_PATH}
   if [ $? -ne 0 ]; then
-    LOGE "create service file failed,exit"
+    LOGE "Creation of service file contaminated, Terminating.."
     exit 1
   else
-    LOGI "create service file success..."
+    LOGI "Creation of service file done!"
   fi
   cat >${SERVICE_FILE_PATH} <<EOF
 [Unit]
@@ -142,7 +142,7 @@ WantedBy=multi-user.target
 EOF
   chmod 644 ${SERVICE_FILE_PATH}
   systemctl daemon-reload
-  LOGD "安装headscale systemd服务成功"
+  LOGD "Installation of headscale on systemd went all correct. =)"
 }
 
 config_headscale() {
@@ -162,13 +162,13 @@ config_headscale() {
   ip=`curl -sL -4 ip.sb`
 
   echo ""
-  read -p " 请输入服务端口[100-65535的一个数字，默认8080]：" port
+  read -p "Enter a number 4Da' service port [100-65535, default 8080]：" port
   [[ -z "${port}" ]] && port=8080
   if [[ "${port:0:1}" = "0" ]]; then
-    LOGE "端口不能以0开头${plain}"
+    LOGE "GET SOME HELP: ${plain} [https://en.wikipedia.org/wiki/Port_(computer_networking)]"
     exit 1
   fi
-  LOGI " 服务地址为：http://${ip}:${port}"
+  LOGI "Serving on service address： <proto>://${ip}:${port}"
 
   cat >${HOME_PATH}/config.yaml <<EOF
 server_url: http://${ip}:${port}
@@ -225,10 +225,10 @@ acl_policy_path: ""
 dns_config:
   override_local_dns: true
   nameservers:
-    - 8.8.8.8
+    - 1.0.0.1
   domains: []
   magic_dns: false
-  base_domain: example.com
+  base_domain: google.com
 
 unix_socket: ${TEMP_PATH}/headscale.sock
 unix_socket_permission: "0770"
@@ -243,9 +243,9 @@ EOF
 enable_headscale() {
   systemctl enable headscale
   if [[ $? == 0 ]]; then
-    LOGI "设置headscale开机自启成功"
+    LOGI "Boot sequence complete - Set da headscale up!"
   else
-    LOGE "设置headscale开机自启失败"
+    LOGE "Boot sequence failure - headscale DOWN. FIX IT THY_SELF."
   fi
 }
 
@@ -284,7 +284,7 @@ restart_headscale() {
 }
 
 stop_headscale() {
-  LOGD "开始停止headscale服务..."
+  LOGD "init/exit headscale service..."
   status_check
   if [ $? == ${STATUS_NOT_INSTALL} ]; then
     LOGE "headscale did not install,can not stop it"
@@ -298,11 +298,11 @@ stop_headscale() {
       exit 1
     fi
   fi
-  LOGD "停止headscale服务成功"
+  LOGD "Termination of headscale done. #peace"
 }
 
 install_headscale() {
-  LOGD "开始安装headscale..."
+  LOGD "Installing headscale KEEP YOUR HEAD UP kid. <3"
   if [[ $# -ne 0 ]]; then
     download_headscale $1
   else
@@ -314,12 +314,12 @@ install_headscale() {
 
   enable_headscale && start_headscale
   headscale namespaces create default
-  LOGI "安装headscale成功,已启动成功"
+  LOGI "Installation as well as service initiation of headscale's done!"
 }
 
 uninstall_headscale() {
   echo ""
-  LOGD "开始卸载headscale..."
+  LOGD "Initiate Uninstall sequence of headscale."
   pidOfheadscale=$(pidof headscale)
   if [ -n ${pidOfheadscale} ]; then
     stop_headscale
@@ -330,10 +330,10 @@ uninstall_headscale() {
   groupdel headscale
 
   if [ $? -ne 0 ]; then
-    LOGE "卸载headscale失败,请检查日志"
+    LOGE "Some technical disability detected for headscale initiation. Check da logs."
     exit 1
   else
-    LOGI "卸载headscale成功"
+    LOGI "Removal headscale was successful."
   fi
 }
 
@@ -369,31 +369,31 @@ show_status() {
   status_check
   case $? in
   0)
-    echo -e "[INF] headscale状态: ${yellow}未运行${plain}"
+    echo -e "[INF] headscale-State: ${yellow}Dead.${plain}"
     ;;
   1)
-    echo -e "[INF] headscale状态: ${green}已运行${plain}"
+    echo -e "[INF] headscale-State: ${green}Running!${plain}"
     ;;
   255)
-    echo -e "[INF] headscale状态: ${red}未安装${plain}"
+    echo -e "[INF] headscale-State: ${red}Dead for real :|${plain}"
     ;;
   esac
 }
 
 show_menu() {
   echo -e "
-  ${green}headscale管理脚本${plain}
-  ${green}0.${plain} 退出脚本
-  ${green}1.${plain} 安装服务
-  ${green}2.${plain} 卸载服务
-  ${green}3.${plain} 启动服务
-  ${green}4.${plain} 停止服务
-  ${green}5.${plain} 重启服务
-  ${green}6.${plain} 查看节点
-  ${green}7.${plain} 添加节点
+  ${green}headscale Managemen!4Å script${plain}
+  ${green}0.${plain} Terminate self.
+  ${green}1.${plain} Install.
+  ${green}2.${plain} Uninstall.
+  ${green}3.${plain} Initiate service.
+  ${green}4.${plain} Out of service.
+  ${green}5.${plain} Re-initiate service.
+  ${green}6.${plain} Vue.i3 Node ;)
+  ${green}7.${plain} [+] Node <3 🤌 [✌️]
  "
   show_status
-  echo && read -p "请输入选择[0-7]:" num
+  echo && read -p "Enter ur numbba ~> [0-7]: " num
   case "${num}" in
   0)
     exit 0
@@ -420,7 +420,7 @@ show_menu() {
     register_node && show_menu
   ;; 
   *)
-    LOGE "请输入正确的选项 [0-7]"
+    LOGE "Choose a valid one bro. [0-7]"
     ;;
   esac
 }
