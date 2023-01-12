@@ -341,14 +341,14 @@ register_node() {
   echo ""
   while true
   do
-    read -p "请输入key：" key
+    read -p "[🔐] K3Y： " key
     if [[ -z "${key}" ]]; then
-      LOGE "输入错误，请重新输入！${plain}"
+      LOGE "Input error, do it again pls. ${plain}"
     else
       break
     fi
   done
-  LOGI "输入的key为：$key"
+  LOGI "Utilizing [🗝️]：$key"
   headscale -n default nodes register --key $key
   headscale nodes list
 }
